@@ -1,18 +1,13 @@
-version: "3.8"
+version: "3.9"
 
 services:
-  cicd_listener:
-    build: .
-    container_name: cicd_listener
-    restart: unless-stopped
+  webhook-listener:
+    build:
+      context: .            
+      dockerfile: Dockerfile  
+    container_name: webhook-listener
     ports:
-      - "9000:9000"
+      - "8080:8080"
     volumes:
-      # Allow controlling host Docker from container
-      - "/var/run/docker.sock:/var/run/docker.sock"
-
-      # Mount deploy script
-      - "/home/kraken/deploy-secret/vps-webhook-github/deploy_vps_sakamoto.sh:/app/deploy.sh:ro"
-
-      # Optional: mount SSH key for GitHub access
-      - "/home/kraken/.ssh:/root/.ssh:ro"
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./hello-world:/app/hello-world

@@ -1,22 +1,18 @@
-FROM python:3.12-slim
+FROM golang:1.23-alpine
 
-# Install git, curl, and docker-compose
-RUN apt-get update && \
-    apt-get install -y git curl docker-compose && \
-    rm -rf /var/lib/apt/lists/*
+# Install git and docker-compose
+RUN apk add --no-cache git bash curl docker-cli docker-compose
 
 WORKDIR /app
 
-# Copy webhook listener
-COPY webhook_listener.py /app/webhook_listener.py
+# Copy your Go webhook code
+COPY . .
 
-# Copy deploy script and make it executable
-COPY deploy_vps_sakamoto.sh /app/deploy.sh
-RUN chmod +x /app/deploy.sh
+# Build Go binary
+RUN go build -o webhook-listener main.go
 
-# Install Flask
-RUN pip install --no-cache-dir flask
+# Expose webhook port
+EXPOSE 8080
 
-EXPOSE 9000
-
-CMD ["python3", "webhook_listener.py"]
+# Run the webhook listener
+CMD ["./webhook-listener"]
